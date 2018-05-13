@@ -14,14 +14,24 @@
   "dependencies": {
     "config": "1.30.0",
     "debug": "3.1.0",
+    "jsonwebtoken": "^8.2.1",
     "koa": "2.5.1",
-    "koa-router": "7.4.0"
+    "koa-bodyparser": "^4.2.0",
+    "koa-compose": "^4.0.0",
+    "koa-mount": "^3.0.0",
+    "koa-router": "7.4.0",
+    "mongoose": "^5.1.0"
   },
   "devDependencies": {
     "@types/config": "0.0.34",
     "@types/debug": "0.0.30",
+    "@types/jsonwebtoken": "^7.2.7",
     "@types/koa": "2.0.45",
+    "@types/koa-bodyparser": "^4.2.0",
+    "@types/koa-compose": "^3.2.2",
+    "@types/koa-mount": "^3.0.1",
     "@types/koa-router": "7.0.28",
+    "@types/mongoose": "^5.0.13",
     "nodemon": "1.17.4",
     "ts-node": "6.0.3",
     "tslint": "5.10.0",

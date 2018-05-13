@@ -1,2 +1,2 @@
-SET DEBUG=app
+SET DEBUG=app:*
 npm start

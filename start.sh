@@ -1,3 +1,3 @@
 #!/bin/bash
 
-DEBUG=app npm start
+DEBUG=app:* npm start
