@@ -62,4 +62,8 @@ export const signup = async (ctx: Koa.Context) => {
   });
 
   await user.save();
+
+  ctx.body = {
+    success: true,
+  };
 };

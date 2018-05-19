@@ -10,7 +10,7 @@ export const GetComments = async (ctx: Koa.Context) => {
     ctx.throw(404);
   }
 
-  const comments = await Comments.find({ post: postId });
+  const comments = await Comments.find({ post: Mongoose.Types.ObjectId(postId) });
 
   ctx.body = {
     code: 200,
@@ -94,8 +94,7 @@ export const DeleteComment = async (ctx: Koa.Context) => {
   if (!comment) {
     ctx.throw(404);
   }
-
-  if ((comment.post as any) !== Mongoose.Types.ObjectId(postId)) {
+  if (!Mongoose.Types.ObjectId(postId).equals(comment.post as any)) {
     ctx.throw(404);
   }
 
