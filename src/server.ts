@@ -14,6 +14,7 @@ error.log = console.info.bind(console);
 
 const server = (async () => {
   try {
+    debug(`Connecting to db "${config.get('db')}"`);
     await Mongoose.connect(config.get('db'));
     debug(`Server connected to db "${config.get('db')}"`);
 
@@ -31,7 +32,7 @@ const server = (async () => {
     app.listen(config.get('port'));
     debug(`Server running on port ${config.get('port')}`);
   } catch (e) {
-    error(e.message || 'Unknown execption');
+    error(`Server startup failed: ${e.message}`);
   }
 })();
 

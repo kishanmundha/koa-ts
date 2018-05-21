@@ -1,57 +1,4 @@
 import * as Koa from 'koa';
-import * as Stream from 'stream';
-
-// export default (req, res, app) => {
-//   const socket = new Stream.Duplex();
-//   req = Object.assign({ headers: {}, socket }, Stream.Readable.prototype, req);
-//   res = Object.assign({ _headers: {}, socket }, Stream.Writable.prototype, res);
-//   req.socket.remoteAddress = req.socket.remoteAddress || '127.0.0.1';
-//   app = app || new Koa();
-//   res.getHeader = (k) => res._headers[k.toLowerCase()];
-//   res.setHeader = (k, v) => res._headers[k.toLowerCase()] = v;
-//   res.removeHeader = (k, v) => delete res._headers[k.toLowerCase()];
-//   return app.createContext(req, res);
-// };
-
-// export const request = (req, res, app) => module.exports(req, res, app).request;
-
-// export const response = (req, res, app) => module.exports(req, res, app).response;
-
-export default (req, res) => {
-  req = Object.assign({ headers: {}, path: '/' }, req);
-
-  const get = (key: string) => {
-    const headerKey = Object.keys(req.headers).filter((hKey) => {
-      return key.toLowerCase() === hKey.toLowerCase();
-    })[0];
-
-    if (headerKey) {
-      return req.headers[headerKey];
-    }
-
-    return;
-  };
-
-  const ctxThrow = (status, message) => {
-    ctx.status = status;
-    throw {
-      message,
-      status,
-    };
-  };
-
-  const ctx = {
-    body: null,
-    get,
-    path: req.path,
-    req,
-    request: req,
-    status: 200,
-    throw: ctxThrow,
-  };
-
-  return ctx;
-};
 
 interface IRequest {
   path?: string;
@@ -133,12 +80,6 @@ export class MockContext {
   }
 
   public throw(status, message) {
-    // this.status = status;
-    // this.body = {
-    //   message,
-    //   status,
-    // };
-
     throw {
       message,
       status,
@@ -150,6 +91,10 @@ export const callKoaFunction = async (ctx: MockContext, fn: (ctx: any) => void) 
   try {
     await fn.call(null, ctx);
   } catch (e) {
+    if (!e.status) {
+      console.log(e); // tslint:disable-line
+    }
+
     ctx.status = e.status || 500;
     ctx.body = {
       message: e.message,

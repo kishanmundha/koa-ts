@@ -1,47 +1,49 @@
 import { expect } from 'chai';
 import 'mocha';
-// import * as ProxyRequire from 'proxyrequire';
+import * as Mongoose from 'mongoose';
 import { proxy } from 'proxyrequire';
 
 import * as jwt from 'jsonwebtoken';
 
-import { callKoaFunction, context, MockContext } from '../../helpers';
+import { callKoaFunction, MockContext, MockModel } from '../../helpers';
 
-import * as AuthController from '../../../src/api/controllers/auth';
+const users = [{
+  _id: Mongoose.Types.ObjectId('0123456789abcdef01234567'),
+  password: 'test',
+  username: 'test',
+}];
+
+const User = MockModel(users);
+
+const AuthController = proxy(() => require('../../../src/api/controllers/auth'), {
+  '../../models': { User },
+});
 
 describe('Auth controller', () => {
   describe('login', () => {
+    const { login } = AuthController;
+
     it('Should throw 400 if username empty', async () => {
-      const ctx: any = context({
+      const ctx = new MockContext({
         body: {
           password: '1234',
           username: '',
         },
-      }, null);
+      });
 
-      try {
-        await AuthController.login(ctx);
-      } catch (e) {
-        expect(e.status).to.equal(400);
-      }
-
+      await callKoaFunction(ctx, login);
       expect(ctx.status).to.equal(400);
     });
 
     it('Should throw 400 if password empty', async () => {
-      const ctx: any = context({
+      const ctx = new MockContext({
         body: {
           password: '',
           username: 'test',
         },
-      }, null);
+      });
 
-      try {
-        await AuthController.login(ctx);
-      } catch (e) {
-        expect(e.status).to.equal(400);
-      }
-
+      await callKoaFunction(ctx, login);
       expect(ctx.status).to.equal(400);
     });
 
@@ -51,10 +53,6 @@ describe('Auth controller', () => {
           password: '1234',
           username: '1234',
         },
-      });
-
-      const login = proxy(() => require('../../../src/api/controllers/auth').login, {
-        '../../models': { Users: { find: () => Promise.resolve(null) } },
       });
 
       await callKoaFunction(ctx, login);
@@ -67,13 +65,9 @@ describe('Auth controller', () => {
     it('Should return jwt token for valid username and password', async () => {
       const ctx = new MockContext({
         body: {
-          password: '1234',
-          username: '1234',
+          password: 'test',
+          username: 'test',
         },
-      });
-
-      const login = proxy(() => require('../../../src/api/controllers/auth').login, {
-        '../../models': { Users: { find: () => ({ username: '1234' }) } },
       });
 
       await callKoaFunction(ctx, login);
@@ -86,31 +80,25 @@ describe('Auth controller', () => {
   });
 
   describe('signup', () => {
-    it('Should reject request for duplicate username', async () => {
-      const signup = proxy(() => require('../../../src/api/controllers/auth').signup, {
-        '../../models': { Users: { find: () => ({ username: '1234' }) } },
-      });
+    const { signup } = AuthController;
 
+    it('Should reject request for duplicate username', async () => {
       const ctx = new MockContext({
-        body: {},
+        body: {
+          username: 'test',
+        },
       });
 
       await callKoaFunction(ctx, signup);
 
       expect(ctx.status).to.equal(400);
     });
+
     it('Should return ok response for valid request', async () => {
-      function Users() {/**/}
-
-      (Users as any).find = () => null;
-      Users.prototype.save = () => null;
-
-      const signup = proxy(() => require('../../../src/api/controllers/auth').signup, {
-        '../../models': { Users },
-      });
-
       const ctx = new MockContext({
-        body: {},
+        body: {
+          username: '1234',
+        },
       });
 
       await callKoaFunction(ctx, signup);

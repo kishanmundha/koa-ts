@@ -4,11 +4,12 @@ import 'mocha';
 import * as jwt from 'jsonwebtoken';
 
 import auth from '../../src/middleware/auth';
-import context from '../helpers/context';
+import { MockContext } from '../helpers';
 
 describe('Auth middleware', () => {
   it('Should reject request on no header', async () => {
-    const mockContext = context(null, null);
+    const mockContext = new MockContext({
+    });
 
     await auth(mockContext as any, () => {
       mockContext.status = 200;
@@ -23,11 +24,11 @@ describe('Auth middleware', () => {
   });
 
   it('Should reject request on empty token', async () => {
-    const mockContext = context({
+    const mockContext = new MockContext({
       headers: {
         Authorization: 'Bearer',
       },
-    }, null);
+    });
 
     await auth(mockContext as any, () => {
       mockContext.status = 200;
@@ -37,11 +38,11 @@ describe('Auth middleware', () => {
   });
 
   it('Should reject request on invalid token', async () => {
-    const mockContext = context({
+    const mockContext = new MockContext({
       headers: {
         Authorization: 'Bearer 324234dfsf',
       },
-    }, null);
+    });
 
     await auth(mockContext as any, () => {
       mockContext.status = 200;
@@ -51,11 +52,11 @@ describe('Auth middleware', () => {
   });
 
   it('Should accept request on valid token', async () => {
-    const mockContext = context({
+    const mockContext = new MockContext({
       headers: {
         Authorization: `Bearer ${jwt.sign('test', '1234')}`,
       },
-    }, null);
+    });
 
     await auth(mockContext as any, () => {
       mockContext.status = 200;

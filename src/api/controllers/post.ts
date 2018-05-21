@@ -1,33 +1,50 @@
 import * as Koa from 'koa';
 import * as Mongoose from 'mongoose';
 
-import { IPost, Posts } from '../../models';
+import { IPost, Post } from '../../models';
+import { ValidationSchema } from '../../utils';
+
+interface IRequestPost {
+  _id?: string;
+  body: string;
+  title: string;
+}
+
+export const GetPostsParamsSchema = ValidationSchema({
+});
+
+export const GetPostParamsSchema = ValidationSchema({
+  postId: { type: Mongoose.Types.ObjectId, required: true },
+});
+
+export const SavePostParamsSchema = ValidationSchema({
+});
+
+export const SavePostBodySchema = ValidationSchema({
+  _id: { type: Mongoose.Types.ObjectId, required: false },
+  body: { type: String, required: true },
+  title: { type: String, required: true },
+});
+
+export const DeletePostParamsSchema = ValidationSchema({
+  postId: { type: Mongoose.Types.ObjectId, required: true },
+});
 
 export const GetPosts = async (ctx: Koa.Context) => {
-  const posts = await Posts.find();
-  ctx.body = {
-    code: 200,
-    data: posts,
-  };
+  const posts = await Post.find();
+  ctx.body = posts;
 };
 
 export const GetPost = async (ctx: Koa.Context) => {
   const { postId } = ctx.params;
 
-  if (!Mongoose.Types.ObjectId.isValid(postId)) {
-    ctx.throw(404);
-  }
-
-  const post = await Posts.findById(Mongoose.Types.ObjectId(postId));
+  const post = await Post.findById(Mongoose.Types.ObjectId(postId));
 
   if (!post) {
     ctx.throw(404);
   }
 
-  ctx.body = {
-    code: 200,
-    data: post,
-  };
+  ctx.body = post;
 };
 
 export const SavePost = async (ctx: Koa.Context) => {
@@ -36,11 +53,7 @@ export const SavePost = async (ctx: Koa.Context) => {
   let post: IPost;
 
   if (requestPost._id) {
-    if (!Mongoose.Types.ObjectId.isValid(requestPost._id)) {
-      ctx.throw(400, 'Invalid id');
-    }
-
-    post = await Posts.findById(Mongoose.Types.ObjectId(requestPost._id));
+    post = await Post.findById(Mongoose.Types.ObjectId(requestPost._id));
 
     if (!post) {
       ctx.throw(404);
@@ -48,26 +61,21 @@ export const SavePost = async (ctx: Koa.Context) => {
 
     Object.assign(post, requestPost);
   } else {
-    post = new Posts(requestPost);
+    post = new Post(requestPost);
   }
 
   await post.save();
 
   ctx.body = {
     _id: post._id,
-    code: 200,
-    message: 'success',
+    message: 'Post saved',
   };
 };
 
 export const DeletePost = async (ctx: Koa.Context) => {
   const { postId } = ctx.params;
 
-  if (!Mongoose.Types.ObjectId.isValid(postId)) {
-    ctx.throw(404);
-  }
-
-  const post = await Posts.findById(Mongoose.Types.ObjectId(postId));
+  const post = await Post.findById(Mongoose.Types.ObjectId(postId));
 
   if (!post) {
     ctx.throw(404);
@@ -76,7 +84,6 @@ export const DeletePost = async (ctx: Koa.Context) => {
   await post.remove();
 
   ctx.body = {
-    code: 200,
-    message: 'success',
+    message: 'Post deleted',
   };
 };

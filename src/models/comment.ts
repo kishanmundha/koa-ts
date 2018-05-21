@@ -1,23 +1,23 @@
 import * as Mongoose from 'mongoose';
 
-import { IPost } from './posts';
-import { IUser } from './users';
+import { IPost } from './post';
+import { IUser } from './user';
 
 const CommentSchema = new Mongoose.Schema({
-  body: { type: Mongoose.Schema.Types.String, required: true },
+  comment: { type: Mongoose.Schema.Types.String, required: true, maxlength: 100, minlength: 1 },
   post: { type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'posts' },
-  title: { type: Mongoose.Schema.Types.String, required: true },
   user: { type: Mongoose.Schema.Types.ObjectId, required: true, ref: 'users' },
 });
 
 interface IComment extends Mongoose.Document {
+  comment: Mongoose.Schema.Types.String;
   post: Mongoose.Schema.Types.ObjectId | IPost;
   user: Mongoose.Schema.Types.ObjectId | IUser;
 }
 
-const Comments = Mongoose.model<IComment>('comments', CommentSchema, 'comments');
+const Comment = Mongoose.model<IComment>('comments', CommentSchema, 'comments');
 
 export {
   IComment,
-  Comments,
+  Comment,
 };

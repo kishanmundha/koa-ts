@@ -2,18 +2,23 @@ import * as config from 'config';
 import * as jwt from 'jsonwebtoken';
 import * as Koa from 'koa';
 
-import { Users } from '../../models';
+import { User } from '../../models';
 
 import { ErrorResponse, SuccessResponse } from '../../classes';
 
+interface IRequestLogin {
+  username: string;
+  password: string;
+}
+
 export const login = async (ctx: Koa.Context) => {
-  const { username, password } = ctx.request.body;
+  const { username, password } = ctx.request.body as IRequestLogin;
 
   if (!username || !password) {
     ctx.throw(400);
   }
 
-  const user = await Users.find({ username, password });
+  const user = await User.findOne({ username, password });
 
   if (!user) {
     ctx.body = {
@@ -48,13 +53,13 @@ export const login = async (ctx: Koa.Context) => {
 export const signup = async (ctx: Koa.Context) => {
   const { username, password, firstName, lastName } = ctx.request.body;
 
-  const existingUser = await Users.find({ username });
+  const existingUser = await User.findOne({ username });
 
   if (existingUser) {
     ctx.throw(400, 'username or email already registered');
   }
 
-  const user = new Users({
+  const user = new User({
     firstName,
     lastName,
     password,

@@ -14,9 +14,9 @@ interface IUser extends Mongoose.Document {
   username: Mongoose.Schema.Types.String;
 }
 
-const Users = Mongoose.model<IUser>('users', UserSchema, 'users');
+const User = Mongoose.model<IUser>('users', UserSchema, 'users');
 
 export {
   IUser,
-  Users,
+  User,
 };

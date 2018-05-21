@@ -1,203 +1,125 @@
 import { expect } from 'chai';
 import 'mocha';
+import * as Mongoose from 'mongoose';
 import { proxy } from 'proxyrequire';
 
-import { callKoaFunction, MockContext } from '../../helpers';
-// import posts from '../../mock-data/posts.json';
+import { callKoaFunction, MockContext, MockModel } from '../../helpers';
+
+const posts = [{
+  _id: Mongoose.Types.ObjectId('0123456789abcdef01234567'),
+  body: 'test body',
+  title: 'test',
+  user: Mongoose.Types.ObjectId('0123456789abcdef01234567'),
+}];
+
+const Post = MockModel(posts);
+
+const PostController = proxy(() => require('../../../src/api/controllers/post'), {
+  '../../models': { Post },
+});
 
 describe('PostController', () => {
   describe('GetPosts', () => {
+    const { GetPosts } = PostController;
     it('Should return array with status 200', async () => {
-      const getPosts = proxy(() => require('../../../src/api/controllers/post').GetPosts, {
-        '../../models': { Posts: { find: () => Promise.resolve([]) } },
-      });
-
       const ctx = new MockContext({
       });
 
-      await callKoaFunction(ctx, getPosts);
+      await callKoaFunction(ctx, GetPosts);
 
       expect(ctx.status).to.equal(200);
-      expect(ctx.body.data).to.deep.equal([]);
+      expect(ctx.body.length).to.equal(1);
     });
   });
 
   describe('GetPost', () => {
-    it('Should return 404 for invalid postId', async () => {
-      const getPost = proxy(() => require('../../../src/api/controllers/post').GetPost, {
-        '../../models': {},
-      });
+    const { GetPost } = PostController;
 
+    it('Should return 404 for not found post', async () => {
       const ctx = new MockContext({
         params: {
-          postId: '123',
+          postId: '0123456789abcdef01234568',
         },
       });
 
-      await callKoaFunction(ctx, getPost);
-
-      expect(ctx.status).to.equal(404);
-    });
-
-    it('Should return 404 for invalid not found post', async () => {
-      const getPost = proxy(() => require('../../../src/api/controllers/post').GetPost, {
-        '../../models': { Posts: { findById: () => Promise.resolve(null) } },
-      });
-
-      const ctx = new MockContext({
-        params: {
-          postId: '0123456789abcdef01234567',
-        },
-      });
-
-      await callKoaFunction(ctx, getPost);
+      await callKoaFunction(ctx, GetPost);
 
       expect(ctx.status).to.equal(404);
     });
 
     it('Should return post with status code 200', async () => {
-      const getPost = proxy(() => require('../../../src/api/controllers/post').GetPost, {
-        '../../models': { Posts: { findById: () => Promise.resolve({}) } },
-      });
-
       const ctx = new MockContext({
         params: {
           postId: '0123456789abcdef01234567',
         },
       });
 
-      await callKoaFunction(ctx, getPost);
+      await callKoaFunction(ctx, GetPost);
 
       expect(ctx.status).to.equal(200);
-      expect(ctx.body.data).to.deep.equal({});
     });
   });
 
   describe('SavePost', () => {
-    it('Should return 400 for invalid request', async () => {
-      const savePost = proxy(() => require('../../../src/api/controllers/post').SavePost, {
-        '../../models': {},
-      });
-
-      const ctx = new MockContext({
-        body: {
-          _id: '1234',
-        },
-      });
-
-      await callKoaFunction(ctx, savePost);
-
-      expect(ctx.status).to.equal(400);
-    });
-
+    const { SavePost } = PostController;
     it('Should return 404 for update with not found post', async () => {
-      const savePost = proxy(() => require('../../../src/api/controllers/post').SavePost, {
-        '../../models': { Posts: { findById: () => Promise.resolve(null) } },
-      });
-
       const ctx = new MockContext({
         body: {
-          _id: '0123456789abcdef01234567',
+          _id: '0123456789abcdef01234568',
         },
       });
 
-      await callKoaFunction(ctx, savePost);
+      await callKoaFunction(ctx, SavePost);
 
       expect(ctx.status).to.equal(404);
     });
 
     it('Should return 200 for update post', async () => {
-      function Posts() {/**/}
-
-      (Posts as any).findById = () => Promise.resolve(new Posts());
-      Posts.prototype.save = () => null;
-
-      const savePost = proxy(() => require('../../../src/api/controllers/post').SavePost, {
-        '../../models': { Posts },
-      });
-
       const ctx = new MockContext({
         body: {
           _id: '0123456789abcdef01234567',
         },
       });
 
-      await callKoaFunction(ctx, savePost);
+      await callKoaFunction(ctx, SavePost);
 
       expect(ctx.status).to.equal(200);
     });
 
     it('Should return 200 for new post', async () => {
-      function Posts() {/**/}
-
-      (Posts as any).findById = () => Promise.resolve(new Posts());
-      Posts.prototype.save = () => null;
-
-      const savePost = proxy(() => require('../../../src/api/controllers/post').SavePost, {
-        '../../models': { Posts },
-      });
-
       const ctx = new MockContext({
         body: {
         },
       });
 
-      await callKoaFunction(ctx, savePost);
+      await callKoaFunction(ctx, SavePost);
 
       expect(ctx.status).to.equal(200);
     });
   });
 
   describe('DeletePost', () => {
-    it('Should return 404 for invalid postId', async () => {
-      const deletePost = proxy(() => require('../../../src/api/controllers/post').DeletePost, {
-        '../../models': { Posts: { findById: () => Promise.resolve(null) } },
-      });
-
-      const ctx = new MockContext({
-        params: {
-          postId: '1234',
-        },
-      });
-
-      await callKoaFunction(ctx, deletePost);
-
-      expect(ctx.status).to.equal(404);
-    });
-
+    const { DeletePost } = PostController;
     it('Should return 404 for not found post', async () => {
-      const deletePost = proxy(() => require('../../../src/api/controllers/post').DeletePost, {
-        '../../models': { Posts: { findById: () => Promise.resolve(null) } },
-      });
-
       const ctx = new MockContext({
         params: {
-          postId: '0123456789abcdef01234567',
+          postId: '0123456789abcdef01234568',
         },
       });
 
-      await callKoaFunction(ctx, deletePost);
+      await callKoaFunction(ctx, DeletePost);
 
       expect(ctx.status).to.equal(404);
     });
 
     it('Should return 200 for success delete post', async () => {
-      function Posts() {/**/}
-
-      (Posts as any).findById = () => Promise.resolve(new Posts());
-      Posts.prototype.remove = () => null;
-
-      const deletePost = proxy(() => require('../../../src/api/controllers/post').DeletePost, {
-        '../../models': { Posts },
-      });
-
       const ctx = new MockContext({
         params: {
           postId: '0123456789abcdef01234567',
         },
       });
 
-      await callKoaFunction(ctx, deletePost);
+      await callKoaFunction(ctx, DeletePost);
 
       expect(ctx.status).to.equal(200);
     });

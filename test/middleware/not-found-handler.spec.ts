@@ -4,7 +4,7 @@ import 'mocha';
 import notFoundHandler from '../../src/middleware/not-found-handler';
 
 describe('Not found handler', () => {
-  it('Test', async() => {
+  it('Test', async () => {
     notFoundHandler({}, async () => {
       //
     });

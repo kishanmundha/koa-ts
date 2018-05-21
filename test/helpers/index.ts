@@ -1,4 +1,4 @@
-export { default as context } from './context';
 export * from './context';
+export * from './model';
 
 export const noop = () => {/**/};
