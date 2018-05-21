@@ -4,8 +4,6 @@ import * as Koa from 'koa';
 
 import { User } from '../../models';
 
-import { ErrorResponse, SuccessResponse } from '../../classes';
-
 interface IRequestLogin {
   username: string;
   password: string;
