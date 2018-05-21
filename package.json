@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch 'src/**/*' -e ts --exec ./node_modules/.bin/ts-node ./src/server.ts",
-    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts",
+    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
     "mocha": "mocha --require ts-node/register",
     "test": "nyc mocha --require ts-node/register test/**/*.spec.ts"
   },
