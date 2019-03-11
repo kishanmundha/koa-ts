@@ -1,10 +1,15 @@
 {
   "name": "koa-ts",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple Koa applicaiton with Typescript",
+  "repository": {
+    "type": "public",
+    "url": "https://github.com/kishanmundha/koa-ts.git"
+  },
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch 'src/**/*' -e ts --exec ./node_modules/.bin/ts-node ./src/server.ts",
+    "serve": "DEBUG=app:* ./node_modules/.bin/ts-node ./src/server.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
     "mocha": "mocha --require ts-node/register",
     "test": "nyc mocha --require ts-node/register 'test/**/*.spec.ts'"

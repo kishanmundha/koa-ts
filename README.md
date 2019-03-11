@@ -11,3 +11,22 @@
 - Typescript
 - Mongoose
 
+## Docker
+
+### Build
+
+```sh
+$ docker-compose build
+```
+
+### Run
+
+```sh
+$ docker-compose up
+```
+
+### Save locally
+
+```sh
+$ docker save -o app.tar "kishanmundha/koa-ts"
+```

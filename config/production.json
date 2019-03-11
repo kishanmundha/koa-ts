@@ -1,0 +1,7 @@
+{
+  "port": 8080,
+  "db": "mongodb://mongo:27017/koa-ts",
+  "jwt": {
+    "secret": "1234"
+  }
+}
